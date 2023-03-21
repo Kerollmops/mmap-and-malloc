@@ -1,0 +1,9 @@
+[package]
+name = "mmap-and-malloc"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.70"
+heed = "0.20.0-alpha.0"
+rand = "0.8.5"
