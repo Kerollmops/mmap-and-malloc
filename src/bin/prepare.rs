@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use std::{fs, mem};
 
+use byte_unit::Byte;
 use clap::Parser;
 use heed::byteorder::BE;
 use heed::types::{ByteSlice, U64};
@@ -17,11 +18,12 @@ struct Opt {
 
     /// The size of the database that will be generated.
     #[arg(long, default_value_t = DATABASE_SIZE)]
-    size: usize,
+    size: Byte,
 }
 
 fn main() -> anyhow::Result<()> {
     let Opt { path, size } = Opt::parse();
+    let size = size.get_bytes().try_into().unwrap();
 
     fs::create_dir_all(&path)?;
     let env = EnvOpenOptions::new()

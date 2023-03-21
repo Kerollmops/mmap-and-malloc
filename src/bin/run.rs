@@ -32,7 +32,7 @@ fn main() -> anyhow::Result<()> {
     let Opt { path, fetch_method, allocate } = Opt::parse();
 
     fs::create_dir_all(&path)?;
-    let env = EnvOpenOptions::new().map_size(DATABASE_SIZE).open(path)?;
+    let env = EnvOpenOptions::new().map_size(DATABASE_SIZE.get_bytes() as usize).open(path)?;
 
     let rtxn = env.read_txn()?;
     let db: Database<U64<BE>, ByteSlice> = env.open_database(&rtxn, None)?.unwrap();
