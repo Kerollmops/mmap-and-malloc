@@ -1,21 +1,35 @@
+use std::path::PathBuf;
 use std::{fs, mem};
 
+use clap::Parser;
 use heed::byteorder::BE;
-use heed::types::{ByteSlice, I64};
+use heed::types::{ByteSlice, U64};
 use heed::{Database, EnvOpenOptions};
+use mmap_and_malloc::{DATABASE_NAME, DATABASE_SIZE};
 use rand::{Fill, Rng};
 
-fn main() -> anyhow::Result<()> {
-    let path = "random.mdb";
-    let database_size = 5 * 1024 * 1024 * 1024; // 5GiB
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+struct Opt {
+    /// The path where the database is stored.
+    #[arg(long, default_value = DATABASE_NAME)]
+    path: PathBuf,
 
-    fs::create_dir_all(path)?;
+    /// The size of the database that will be generated.
+    #[arg(long, default_value_t = DATABASE_SIZE)]
+    size: usize,
+}
+
+fn main() -> anyhow::Result<()> {
+    let Opt { path, size } = Opt::parse();
+
+    fs::create_dir_all(&path)?;
     let env = EnvOpenOptions::new()
-        .map_size(database_size * 2) // Just to make sure internal pages are taken into account
+        .map_size(size * 2) // Just to make sure internal pages are taken into account
         .open(path)?;
 
     let mut wtxn = env.write_txn()?;
-    let db: Database<I64<BE>, ByteSlice> = env.create_database(&mut wtxn, None)?;
+    let db: Database<U64<BE>, ByteSlice> = env.create_database(&mut wtxn, None)?;
 
     let mut rng = rand::thread_rng();
     let mut buffer = vec![0; 1024];
@@ -26,7 +40,7 @@ fn main() -> anyhow::Result<()> {
         db.put(&mut wtxn, &i, value)?;
 
         entries_size += mem::size_of_val(&i) + value.len();
-        if entries_size >= database_size {
+        if entries_size >= size {
             break;
         }
     }

@@ -5,5 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.70"
+byte-unit = "4.0.19"
+clap = { version = "4.1.11", features = ["derive"] }
 heed = "0.20.0-alpha.0"
 rand = "0.8.5"
