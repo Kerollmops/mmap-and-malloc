@@ -41,7 +41,7 @@ fn main() -> anyhow::Result<()> {
     // We fill the buffer with random data to be sure the OS doesn't ignore it
     // but effectively store it in the RSS.
     let mut rng = rand::thread_rng();
-    let mut noise_buffer = vec![0; allocate.get_bytes().try_into().unwrap()];
+    let mut noise_buffer = vec![0u8; allocate.get_bytes().try_into().unwrap()];
     noise_buffer.as_mut_slice().try_fill(&mut rng)?;
 
     match fetch_method {
