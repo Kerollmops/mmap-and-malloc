@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::time::Instant;
 use std::{fs, io, mem};
 
 use byte_unit::Byte;
@@ -44,6 +45,8 @@ fn main() -> anyhow::Result<()> {
     let mut noise_buffer = vec![0u8; allocate.get_bytes().try_into().unwrap()];
     noise_buffer.as_mut_slice().try_fill(&mut rng)?;
 
+    let now = Instant::now();
+
     match fetch_method {
         FetchMethod::Iterative => {
             for result in db.iter(&rtxn)? {
@@ -75,7 +78,11 @@ fn main() -> anyhow::Result<()> {
         }
     }
 
-    println!("The amount of data fetched is about {} bytes.", entries_size);
+    println!(
+        "The amount of data fetched is about {} bytes, this took {:.02?}.",
+        entries_size,
+        now.elapsed()
+    );
 
     println!("Please press [enter] to quit the program: ");
     io::stdin().read_line(&mut String::new())?;
