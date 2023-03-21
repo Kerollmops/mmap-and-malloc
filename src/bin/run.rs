@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use std::{fs, mem};
+use std::{fs, io, mem};
 
 use byte_unit::Byte;
 use clap::{Parser, ValueEnum};
@@ -76,6 +76,9 @@ fn main() -> anyhow::Result<()> {
     }
 
     println!("The amount of data fetched is about {} bytes.", entries_size);
+
+    println!("Please press [enter] to quit the program: ");
+    io::stdin().read_line(&mut String::new())?;
 
     Ok(())
 }
